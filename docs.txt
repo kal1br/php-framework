@@ -1,0 +1,2 @@
+# php
+docker-compose run --rm php-cli php
