@@ -17,22 +17,66 @@ final class ServerRequest
 
     public function __construct(
         array $serverParams,
-        Uri $uri,
-        string $method,
         array $queryParams,
-        array $headers,
         array $cookies,
-        Stream $body,
-        ?array $parsedBody
+        ?array $parsedBody,
+        mixed $body = null
     ) {
         $this->serverParams = $serverParams;
-        $this->uri = $uri;
-        $this->method = $method;
         $this->queryParams = $queryParams;
-        $this->headers = $headers;
         $this->cookies = $cookies;
-        $this->body = $body;
         $this->parsedBody = $parsedBody;
+
+        $this->uri = $this->initUri();
+        $this->headers = $this->initHeaders();
+        $this->method = $this->initMethod();
+        $this->body = $body ? new Stream($body) : $this->initBody();
+    }
+
+    public static function createFromGlobals(): ServerRequest
+    {
+        return new self(
+            serverParams: $_SERVER,
+            queryParams: $_GET,
+            cookies: $_COOKIE,
+            parsedBody: $_POST,
+        );
+    }
+
+    protected function initUri(): Uri
+    {
+        $scheme = $this->serverParams['REQUEST_SCHEME'] ?? 'http';
+        $host = $this->serverParams['HTTP_HOST'] ?? '';
+        $uri = $this->serverParams['REQUEST_URI'] ?? '';
+
+        return new Uri($scheme . '://' . $host . $uri);
+    }
+
+    protected function initHeaders(): array
+    {
+        $headers = [
+            'Content-Type' => $this->serverParams['CONTENT_TYPE'] ?? '',
+            'Content-Length' => $this->serverParams['CONTENT_LENGTH'] ?? '',
+        ];
+
+        foreach ($this->serverParams as $serverName => $serverValue) {
+            if (str_starts_with($serverName, 'HTTP_')) {
+                $name = ucwords(strtolower(str_replace('_', '-', substr($serverName, 5))), '-');
+                $headers[$name] = $serverValue;
+            }
+        }
+
+        return $headers;
+    }
+
+    protected function initMethod(): string
+    {
+        return $this->serverParams['REQUEST_METHOD'] ?? '';
+    }
+
+    protected function initBody(): Stream
+    {
+        return new Stream(fopen('php://input', 'r'));
     }
 
     public function getServerParams(): array

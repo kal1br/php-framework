@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-use function Framework\Http\createServerRequestFromGlobals;
+use Framework\Http\Message\ServerRequest;
+use Framework\Http\Message\ServerResponse;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$request = createServerRequestFromGlobals();
-
-echo '<pre>';
-var_dump($request->getHeaders());
-echo '</pre>';
+$request = ServerRequest::createFromGlobals();
+$response = new ServerResponse('<h1>Hello</h1>');
+$response->send();

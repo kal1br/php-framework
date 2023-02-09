@@ -13,24 +13,35 @@ final class ServerRequestTest extends TestCase
 {
     public function testCreate(): void
     {
+        $serverParams = [
+            'REQUEST_SCHEME' => 'https',
+            'HTTP_HOST' => 'localhost',
+            'REQUEST_URI' => '/home',
+            'REQUEST_METHOD' => 'POST',
+        ];
+
+        $input = fopen('php://memory', 'r+');
+        fwrite($input, 'Body');
+
         $request = new ServerRequest(
-            serverParams: $serverParams = ['HOST' => 'app.test'],
-            uri: $uri = new Uri('/home'),
-            method: $method = 'GET',
+            serverParams: $serverParams,
             queryParams: $queryParams = ['name' => 'john'],
-            headers: $headers = ['X-Header' => 'Value'],
             cookies: $cookies = ['Cookie' => 'Value'],
-            body: $body = new Stream(fopen('php://memory', 'r')),
-            parsedBody: $parsedBody = ['title' => 'title']
+            parsedBody: $parsedBody = ['title' => 'title'],
+            body: $input
         );
 
         self::assertEquals($serverParams, $request->getServerParams());
-        self::assertEquals($uri, $request->getUri());
-        self::assertEquals($method, $request->getMethod());
+        self::assertEquals('https://localhost/home', $request->getUri());
+        self::assertEquals($serverParams['REQUEST_METHOD'], $request->getMethod());
         self::assertEquals($queryParams, $request->getQueryParams());
-        self::assertEquals($headers, $request->getHeaders());
+        self::assertEquals(['Content-Type' => '', 'Content-Length' => '', 'Host' => 'localhost'], $request->getHeaders());
         self::assertEquals($cookies, $request->getCookies());
-        self::assertEquals($body, $request->getBody());
         self::assertEquals($parsedBody, $request->getParsedBody());
+        self::assertEquals('Body', (string)$request->getBody());
+        self::assertEquals($serverParams['HTTP_HOST'], $request->getServerParam('HTTP_HOST'));
+        self::assertEquals($queryParams['name'], $request->getQueryParam('name'));
+        self::assertEquals($serverParams['HTTP_HOST'], $request->getHeader('Host'));
+        self::assertEquals($cookies['Cookie'], $request->getCookie('Cookie'));
     }
 }
