@@ -11,9 +11,9 @@ class Application
     protected Router $router;
     protected ServerResponse $response;
 
-    public function __construct($router)
+    public function __construct()
     {
-        $this->router = $router;
+        $this->router = Router::getInstance();
         $this->response = new ServerResponse();
     }
 
