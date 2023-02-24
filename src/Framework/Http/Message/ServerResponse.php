@@ -21,12 +21,15 @@ class ServerResponse
     {
         $this->sendHeaders();
         $this->sendContent();
+        die;
     }
 
     public function sendHeaders(): static
     {
-        foreach ($this->headers as $name => $value) {
-            header($name . ': ' . $value);
+        foreach ($this->headers as $name => $values) {
+            foreach ($values as $value) {
+                header($name . ': ' . $value);
+            }
         }
 
         http_response_code($this->statusCode);
@@ -46,15 +49,37 @@ class ServerResponse
      */
     public function getHeaders(): array
     {
-        return $this->headers;
+        $result = [];
+
+        foreach ($this->headers as $name => $value) {
+            $result[$name] = count($value) > 1 ? $value : $value[0];
+        }
+
+        return $result;
     }
 
     /**
-     * @param array $headers
+     * @param string $name
+     * @return array|string
      */
-    public function setHeaders(array $headers): void
+    public function getHeader(string $name): array|string
     {
-        $this->headers = $headers;
+        if (is_array($this->headers[$name])) {
+            if (count($this->headers[$name]) > 1) {
+                return $this->headers[$name];
+            } else {
+                return $this->headers[$name][0];
+            }
+        }
+
+        return '';
+    }
+
+    public function setHeader($name, $value): static
+    {
+        $this->headers[$name][] = $value;
+
+        return $this;
     }
 
     /**

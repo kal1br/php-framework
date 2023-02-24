@@ -11,12 +11,11 @@ class ServerResponseTest extends TestCase
 {
     public function testCreate(): void
     {
-        $headers = ['X-header' => 'value'];
         $statusCode = 202;
         $content = 'hello';
 
         $response = new ServerResponse();
-        $response->setHeaders($headers);
+        $response->setHeader('X-header', 'value');
         $response->setStatusCode($statusCode);
         $response->setContent($content);
 
@@ -25,7 +24,8 @@ class ServerResponseTest extends TestCase
         $resultContent = ob_get_contents();
         ob_end_clean();
 
-        self::assertEquals($headers, $response->getHeaders());
+        self::assertEquals(['X-header' => 'value'], $response->getHeaders());
+        self::assertEquals('value', $response->getHeader('X-header'));
         self::assertEquals($statusCode, $response->getStatusCode());
         self::assertEquals($content, $response->getContent());
         self::assertEquals($content, $resultContent);
