@@ -8,8 +8,9 @@ use Framework\Http\Message\ServerRequest;
 
 class Router
 {
-    protected ServerRequest $request;
+    private static ?Router $instance = null;
 
+    protected ServerRequest $request;
     protected array $routes = [];
 
     public function __construct()
@@ -17,29 +18,48 @@ class Router
         $this->request = ServerRequest::createFromGlobals();
     }
 
-    public function addRoute($url, $controller, $action): void
+    public static function getInstance(): self
     {
-        $pattern = preg_replace('/\//', '\\/', $url);
-        $pattern = '/^' . $pattern . '$/';
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
 
-        $this->routes[$pattern] = [
-            'controller' => $controller,
+        return self::$instance;
+    }
+
+    public static function get(string $path, string $handler, string $action): void
+    {
+        self::getInstance()->addRoute('GET', $path, $handler, $action);
+    }
+
+    public static function post(string $path, string $handler, string $action): void
+    {
+        self::getInstance()->addRoute('POST', $path, $handler, $action);
+    }
+
+    public function addRoute(string $method, string $path, string $handler, $action): void
+    {
+        $this->routes[$method][$path] = [
+            'handler' => $handler,
             'action' => $action,
         ];
     }
 
-    public function getCurrentRoute()
+    public function getCurrentRoute(): ?array
     {
-        $url = $this->request->getUri()->getPath();
+        $uri = $this->request->getUri()->getPath();
         $method = $this->request->getMethod();
 
-        foreach ($this->routes as $pattern => $route) {
-            if (preg_match($pattern, $url, $matches) && strtoupper($method) == 'GET') {
-                $route['params'] = array_slice($matches, 1);
-                return $route;
-            } elseif (preg_match($pattern, $url, $matches) && strtoupper($method) == 'POST') {
-                $route['params'] = $this->request->getParsedBody();
-                return $route;
+        foreach ($this->routes[$method] as $path => $route) {
+            $pattern = '~^' . preg_replace('/{([a-zA-Z]+)}/', '(?P<$1>[^/]+)', $path) . '$~';
+
+            if (preg_match($pattern, $uri, $matches)) {
+                $params = array_filter($matches, '\is_string', ARRAY_FILTER_USE_KEY);
+                return [
+                    'controller' => $route['handler'],
+                    'action' => $route['action'],
+                    'params' => $params,
+                ];
             }
         }
 
