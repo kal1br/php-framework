@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace App\controllers;
 
 use Exception;
-use Framework\View;
+use Framework\Http\Message\ServerResponse;
+use Framework\Core\View;
 
 class HomeController
 {
     /**
      * @throws Exception
      */
-    public function index(): void
+    public function index(): ServerResponse
     {
         $title = 'Добро пожаловать в наше приложение!';
         $description = 'Описание приложения и его возможностей';
 
-        View::render('home/index.php', [
+        return View::render('home/index.php', [
             'title' => $title,
             'description' => $description,
         ]);

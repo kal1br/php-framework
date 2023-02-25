@@ -3,6 +3,6 @@
 
 declare(strict_types=1);
 
-use Framework\Router;
+use Framework\Core\Router;
 
 Router::get('/', 'home', 'index');
