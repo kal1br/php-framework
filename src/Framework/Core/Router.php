@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Framework;
+namespace Framework\Core;
 
 use Framework\Http\Message\ServerRequest;
 
