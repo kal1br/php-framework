@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Framework\Core\Exception;
+namespace Framework\Core\Handlers;
 
 use Exception;
 use Framework\Http\Message\ServerResponse;

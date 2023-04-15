@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Framework\Http\Core;
+namespace Test\Framework\Core\Util;
 
-use Framework\Core\Config;
+use Framework\Core\Util\Config;
 use PHPUnit\Framework\TestCase;
 
 class ConfigTest extends TestCase

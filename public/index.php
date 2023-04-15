@@ -3,27 +3,15 @@
 declare(strict_types=1);
 
 
-use Framework\Core\Application;
-use Framework\Core\Config;
-use Framework\Core\Exception\ExceptionHandler;
-use Framework\Core\Router;
-use Framework\Http\Message\ServerResponse;
+use Framework\Core\Application\App;
+use Framework\Core\Application\Kernel;
+use Framework\Http\Message\ServerRequest;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
 require_once __DIR__ . '/../routes.php';
 
-$config = new Config([
-    'production' => false,
-]);
-
-$router = Router::getInstance();
-
-$serverResponse = new ServerResponse();
-
-$exceptionHandler = new ExceptionHandler($config->get('production'));
-
-$app = new Application($config, $router, $serverResponse, $exceptionHandler);
-
-$response = $app->run();
+$app = new App();
+$kernel = new Kernel($app);
+$response = $kernel->handle(ServerRequest::createFromGlobals());
 $response->send();

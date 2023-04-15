@@ -2,11 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Framework\Core;
+namespace Framework\Core\Util;
 
 class Config
 {
+    private static ?Config $instance = null;
+
     private array $config;
+
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
 
     public function __construct(array $config = [])
     {
