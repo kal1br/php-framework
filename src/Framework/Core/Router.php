@@ -10,13 +10,7 @@ class Router
 {
     private static ?Router $instance = null;
 
-    protected ServerRequest $request;
     protected array $routes = [];
-
-    public function __construct()
-    {
-        $this->request = ServerRequest::createFromGlobals();
-    }
 
     public static function getInstance(): self
     {
@@ -45,10 +39,10 @@ class Router
         ];
     }
 
-    public function getCurrentRoute(): ?array
+    public function match(ServerRequest $request): ?array
     {
-        $uri = $this->request->getUri()->getPath();
-        $method = $this->request->getMethod();
+        $uri = $request->getUri()->getPath();
+        $method = $request->getMethod();
 
         foreach ($this->routes[$method] as $path => $route) {
             $pattern = '~^' . preg_replace('/{([a-zA-Z]+)}/', '(?P<$1>[^/]+)', $path) . '$~';
