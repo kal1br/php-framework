@@ -15,7 +15,13 @@ class App extends DIContainer
 {
     public function __construct()
     {
+        $this->init();
         $this->registerCoreContainers();
+    }
+
+    public function init(): void
+    {
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/../.' . Router::PATH_FILE;
     }
 
     public function registerCoreContainers(): void

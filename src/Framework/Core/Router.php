@@ -8,6 +8,8 @@ use Framework\Http\Message\ServerRequest;
 
 class Router
 {
+    public const PATH_FILE = '/data/routes.php';
+
     private static ?Router $instance = null;
 
     protected array $routes = [];
