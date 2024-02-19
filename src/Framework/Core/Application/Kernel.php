@@ -75,10 +75,6 @@ class Kernel
 
             $params = $route['params'];
 
-            if (!$this->response instanceof ServerResponse) {
-                throw new \Exception("Controller methods must return a Response object.");
-            }
-
             $this->response = call_user_func_array([$controller, $actionName], $params);
 
         } catch (Exception $e) {
@@ -91,13 +87,10 @@ class Kernel
      */
     private function handleException(Exception $e): void
     {
+        /** @var ExceptionHandler $handler */
         $handler = $this->container->get(ExceptionHandler::class);
 
         $response = $handler->handle($e);
-
-        if (!$response instanceof ServerResponse) {
-            throw new Exception("Exception handlers must return a Response object.");
-        }
 
         $this->response = $response;
     }
