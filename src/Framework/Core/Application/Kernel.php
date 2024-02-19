@@ -13,36 +13,32 @@ use Framework\Http\Message\ServerResponse;
 
 class Kernel
 {
-    private DIContainer $container;
     private Router $router;
+    private ExceptionHandler $handler;
     private ServerRequest $request;
     private ServerResponse $response;
 
-    public function __construct(DIContainer $container)
+    public function __construct(Router $router, ExceptionHandler $handler)
     {
-        $this->container = $container;
-        $this->router = $container->get('router');
+        $this->router = $router;
+        $this->handler = $handler;
     }
 
     /**
      * @param ServerRequest $request
      * @return ServerResponse
-     * @throws Exception
      */
     public function handle(ServerRequest $request): ServerResponse
     {
         $this->request = $request;
 
-        $this->response = $this->container->get('response');
+        $this->response = new ServerResponse();
 
         $this->routeRequest();
 
         return $this->response;
     }
 
-    /**
-     * @throws Exception
-     */
     private function routeRequest(): void
     {
         try {
@@ -78,20 +74,7 @@ class Kernel
             $this->response = call_user_func_array([$controller, $actionName], $params);
 
         } catch (Exception $e) {
-            $this->handleException($e);
+            $this->response = $this->handler->handle($e);
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function handleException(Exception $e): void
-    {
-        /** @var ExceptionHandler $handler */
-        $handler = $this->container->get(ExceptionHandler::class);
-
-        $response = $handler->handle($e);
-
-        $this->response = $response;
     }
 }

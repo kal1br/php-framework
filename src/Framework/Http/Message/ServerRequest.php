@@ -52,20 +52,20 @@ final class ServerRequest
         return new Uri($scheme . '://' . $host . $uri);
     }
 
-     protected function initHeaders(): array
-     {
-         $headers['Content-Type'][] = $this->serverParams['CONTENT_TYPE'] ?? '';
-         $headers['Content-Length'][] = $this->serverParams['CONTENT_LENGTH'] ?? '';
+    protected function initHeaders(): array
+    {
+        $headers['Content-Type'][] = $this->serverParams['CONTENT_TYPE'] ?? '';
+        $headers['Content-Length'][] = $this->serverParams['CONTENT_LENGTH'] ?? '';
 
-         foreach ($this->serverParams as $serverName => $serverValue) {
-             if (str_starts_with($serverName, 'HTTP_')) {
-                 $name = ucwords(strtolower(str_replace('_', '-', substr($serverName, 5))), '-');
-                 $headers[$name][] = $serverValue;
-             }
-         }
+        foreach ($this->serverParams as $serverName => $serverValue) {
+            if (str_starts_with($serverName, 'HTTP_')) {
+                $name = ucwords(strtolower(str_replace('_', '-', substr($serverName, 5))), '-');
+                $headers[$name][] = $serverValue;
+            }
+        }
 
-         return $headers;
-     }
+        return $headers;
+    }
 
     protected function initMethod(): string
     {
