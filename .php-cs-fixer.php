@@ -18,8 +18,4 @@ return
         )
         ->setRules([
             '@PSR12' => true,
-            '@PSR12:risky' => true,
-            '@PHP80Migration' => true,
-            '@PHP80Migration:risky' => true,
-            '@PHPUnit84Migration:risky' => true,
         ]);
